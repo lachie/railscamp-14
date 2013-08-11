@@ -13,7 +13,7 @@ a { color: inherit; text-decoration: none; }
 
 /* Image background */
 html {
-  background: url("/images/bg.jpg") no-repeat center bottom fixed;
+  background: url("/images/bg.jpg") no-repeat center top fixed;
   background-size: cover;
 }
 
@@ -37,7 +37,7 @@ body {
   font-family: "source-sans-pro";
 }
 
-[role='banner'] { color: black; }
+[role='banner'] { color: white; }
 [role='main'] { margin-top: 5em; }
 
 .monogram {
@@ -49,7 +49,6 @@ body {
     letter-spacing: 2px;
     margin-bottom: .1em;
     text-align: center;
-    text-shadow: 0 1px 0 rgba(255, 255, 255, .2);
   }
 }
 
@@ -58,13 +57,12 @@ body {
 .event-details {
   font-weight: 900;
   font-style: italic;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, .2);
 }
 
 .home .monogram { margin-top: 6em; }
 .home .event-info {
   margin-top: 3em;
-  color: black;
+  color: white;
 
   .dates { display: block; }
 
@@ -73,8 +71,9 @@ body {
   .event-details {
     margin-top: .5em;
     margin-left: 1em;
+    min-width: 7em;
 
-    font-size: 2.1em;
+    font-size: 2.0em;
   }
 
   .register { float: left; margin-top: 2em; font-size: 2em; }
@@ -88,6 +87,7 @@ body {
   .monogram h1 { font-size: 2.6em; margin-right: .7em; }
 
   .monogram h1, .event-details { display: inline-block; }
+  .event-details { min-width: 7em; }
   .icon { position: absolute; top: 0; right: 0; }
 }
 
@@ -100,6 +100,11 @@ body {
   .price { margin: 0; line-height: 1; font-size: 2em; font-weight: 700;  }
   .price-buys { font-size: .8em; }
 }
+
+.ballot-info {
+  p,h1,h2 { background: rgba(28,28,28,.5); }
+}
+
 form { padding: 2em 1em .7em 1em; background: black; border-radius: 3px; }
 
 form, fieldset, input, textarea, .register-button { border-radius: 3px; }

@@ -358,7 +358,7 @@ a {
 
 /* Image background */
 html {
-  background: url("/images/bg.jpg") no-repeat center bottom fixed;
+  background: url("/images/bg.jpg") no-repeat center top fixed;
   background-size: cover; }
 
 /* Fade in the body when everything has loaded */
@@ -377,7 +377,7 @@ body {
   font-family: "source-sans-pro"; }
 
 [role='banner'] {
-  color: black; }
+  color: white; }
 
 [role='main'] {
   margin-top: 5em; }
@@ -389,8 +389,7 @@ body {
   text-transform: uppercase;
   letter-spacing: 2px;
   margin-bottom: .1em;
-  text-align: center;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.2); }
+  text-align: center; }
 
 .monogram, .event-details {
   display: inline-block;
@@ -398,15 +397,14 @@ body {
 
 .event-details {
   font-weight: 900;
-  font-style: italic;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.2); }
+  font-style: italic; }
 
 .home .monogram {
   margin-top: 6em; }
 
 .home .event-info {
   margin-top: 3em;
-  color: black; }
+  color: white; }
   .home .event-info .dates {
     display: block; }
   .home .event-info h1 {
@@ -414,7 +412,8 @@ body {
   .home .event-info .event-details {
     margin-top: .5em;
     margin-left: 1em;
-    font-size: 2.1em; }
+    min-width: 7em;
+    font-size: 2.0em; }
   .home .event-info .register {
     float: left;
     margin-top: 2em;
@@ -429,6 +428,8 @@ body {
     margin-right: .7em; }
   .event-info[role='banner'] .monogram h1, .event-info[role='banner'] .event-details {
     display: inline-block; }
+  .event-info[role='banner'] .event-details {
+    min-width: 7em; }
   .event-info[role='banner'] .icon {
     position: absolute;
     top: 0;
@@ -445,6 +446,9 @@ body {
     font-weight: 700; }
   .ticket-info .price-buys {
     font-size: .8em; }
+
+.ballot-info p, .ballot-info h1, .ballot-info h2 {
+  background: rgba(28, 28, 28, 0.5); }
 
 form {
   padding: 2em 1em .7em 1em;
@@ -536,7 +540,7 @@ footer[role='contentinfo'] {
   display: table-footer-group; }
 
 .sponsor {
-  display: inline-block;
+  display: block;
   padding: 1em 0 2em;
   text-decoration: none; }
   .sponsor.pin {
@@ -552,6 +556,3 @@ footer[role='contentinfo'] {
         vertical-align: middle;
         padding-left: .2em;
         padding-bottom: .1em; }
-.twitter {
-  display: inline-block;
-  padding: 1em 0 2em; }
