@@ -171,6 +171,7 @@ class Thirteen < Sinatra::Base
   post '/scholarship' do
     STDERR.puts JSON.generate(params)
     entrant = ScholarshipEntrant.new(params[:entrant])
+    entrant.ip_address = request.ip
     if entrant.valid?
       entrant.save
       redirect "/✌"
