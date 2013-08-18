@@ -29,11 +29,13 @@
 
     <h2>Scholarships</h2>
 
-    <p>This year we're offering a number of scholarships to students.</p>
+    <p>This year we're offering a number of scholarship tickets to students.</p>
 
-    <p>We've dedicated a number of tickets to scholarships– these tickets will be allocated from a separate pool.<p>
+    <p>We've dedicated a number of tickets to scholarships– these tickets are paid for by generous sponsors and will be allocated from a different pool to the main ballot.<p>
     
     <p>If you'd like to enter, instead of credit card details, enter your github username and a short pitch on how you'd use the scholarship.</p>
+
+    <p><em>You must be over 18 to enter.</em></p>
 
     <p>You have until <strong>midnight (AEST) on Monday September 2</strong> to apply.</p>
   <% end %>
@@ -61,81 +63,105 @@
       <textarea id="diet" name="entrant[dietary_reqs]"></textarea>
     </fieldset>
 
-    <h2>T-Shirt sizing</h2>
-    <p>You get a t-shirt just for attending. Go you!</p>
 
-    <fieldset class="t-shirt">
-      <input name="entrant[tee_cut]" type="radio" value="male" id="entrant_tee_cut_male" autocomplete="off">
-      <label for="entrant_tee_cut_male">Male</label>
-
-      <input name="entrant[tee_cut]" type="radio" value="female" id="entrant_tee_cut_female" autocomplete="off">
-      <label for="entrant_tee_cut_female">Female</label>
-
-      <label class="size" for="entrant_tee_size_male">Size</label>
-      <select class="size" name="entrant[tee_size_male]" id="entrant_tee_size_male" autocomplete="off">
-        <% for s in male_tee_sizes %><option value="<%= s %>" <%= "selected" if s == tee_size_default %>><%= s %></option><% end %>
-      </select>
-
-      <label class="size" for="entrant_tee_size_female">Size</label>
-      <select class="size" name="entrant[tee_size_female]" id="entrant_tee_size_female" autocomplete="off">
-        <% for s in female_tee_sizes %><option value="<%= s %>" <%= "selected" if s == tee_size_default %>><%= s %></option><% end %>
-      </select>
-    </fieldset>
-
-    <h2>Card details</h2>
-
+    <h2>I think I'll need the bus to get to camp</h2>
+    <p>This isn't a ticket for the bus, just an indication for our planning.</p>
     <fieldset>
-      <label for="cc-name">Name on card</label>
-      <input id="cc-name" name='entrant[cc_name]' required autocompletetype="cc-name" format=".+\s.+" pattern=".+\s.+" data-pin="name">
+      <input id="transport-bus" type="radio" name="entry-transport" autocomplete="off">
+      <label for="transport-bus">I want to ride the bus.</label>
+
+      <input id="transport-other" type="radio" name="entry-transport" autocomplete="off">
+      <label for="transport-other">I'm driving/riding/flying under my own steam.</label>
     </fieldset>
 
+    <h2>Ticket type</h2>
     <fieldset>
-      <label for="cc-number">Credit card number</label>
-      <input id="cc-number" type="text" autocompletetype="cc-number" format="\d{15,16}" pattern="\d{15,16}" placeholder="4242424242424242" required data-pin="number">
+      <input id="type-ballot" type="radio" name="entry-type" value="ballot" autocomplete="off">
+      <label for="type-ballot">I'm entering the ballot</label>
+
+      <input id="type-scholarship" type="radio" name="entry-type" value="scholarship" autocomplete="off">
+      <label for="type-scholarship">I'm applying for a scholarship ticket</label>
     </fieldset>
 
-    <fieldset>
-      <label for="cc-expiry">Expiry (MM/YYYY)</label>
-      <input id="cc-expiry" type="text" autocompletetype="cc-expiry" format="\d{2}/(\d{2}|\d{4})" pattern="\d{2}/(\d{2}|\d{4})" placeholder="01/2020" required data-pin="expiry">
-    </fieldset>
+    <div id="scholarship-part" class="entry-part">
+      <h2>Apply for a scholarship</h2>
+      <p>Show us your code on github and write a bit about how you'd use your scholarship.</p>
 
-    <fieldset>
-      <label for="cc-cvc">CVC</label>
-      <input id="cc-cvc" type="text" autocompletetype="cc-csc" placeholder="123" required autocomplete="off" data-pin="cvc">
-    </fieldset>
+      <fieldset>
+        <label for="schol-github">http://github.com/</label>
+        <input id="schol-github" name='entrant[scholarship_github]'>
+      </fieldset>
 
-    <fieldset>
-      <label for="cc-address">Address</label>
-      <input id="cc-address" name='entrant[cc_address]' required autocompletetype="street-address" data-pin="address_line1">
-    </fieldset>
+      <fieldset>
+        <label for="schol_pitch">I'd use my scholarship to</label>
+        <textarea id="schol_pitch" name="entrant[scholarship_pitch]"></textarea>
+      </fieldset>
 
-    <fieldset>
-      <label for="cc-city">City</label>
-      <input id="cc-city" name='entrant[cc_city]' required autocompletetype="city" data-pin="address_city">
-    </fieldset>
+      <fieldset class="registration">
+        <div class="registration-agreement">
+          We'll review your details and let you know<br>
+          if you've been selected.
+        </div>
+        <button class="register-button" data-busy-text="Hold tight...">Apply</button>
+      </fieldset>
+    </div>
 
-    <fieldset>
-      <label for="cc-postcode">Postcode</label>
-      <input id="cc-postcode" name='entrant[cc_post_code]' required autocompletetype="postal-code" data-pin="address_postcode">
-    </fieldset>
+    <div id="ballot-part" class="entry-part">
+      <h2>Card details</h2>
 
-    <fieldset>
-      <label for="cc-state">State</label>
-      <input id="cc-state" name='entrant[cc_state]' required autocompletetype="state" data-pin="address_state">
-    </fieldset>
+      <fieldset>
+        <label for="cc-name">Name on card</label>
+        <input id="cc-name" name='entrant[cc_name]' required autocompletetype="cc-name" format=".+\s.+" pattern=".+\s.+" data-pin="name">
+      </fieldset>
 
-    <fieldset>
-      <label for="cc-country">Country</label>
-      <input id="cc-country" name='entrant[cc_country]' required autocompletetype="country-name" data-pin="address_country">
-    </fieldset>
+      <fieldset>
+        <label for="cc-number">Credit card number</label>
+        <input id="cc-number" type="text" autocompletetype="cc-number" format="\d{15,16}" pattern="\d{15,16}" placeholder="4242424242424242" required data-pin="number">
+      </fieldset>
 
-    <fieldset class="registration">
-      <div class="registration-agreement">
-        This card will be billed $275 on May 22nd,<br>
-        <em>only</em> if you’re successful in the ballot.
-      </div>
-      <button class="register-button" data-busy-text="Hold tight...">Enter the ballot</button>
-    </fieldset>
+      <fieldset>
+        <label for="cc-expiry">Expiry (MM/YYYY)</label>
+        <input id="cc-expiry" type="text" autocompletetype="cc-expiry" format="\d{2}/(\d{2}|\d{4})" pattern="\d{2}/(\d{2}|\d{4})" placeholder="01/2020" required data-pin="expiry">
+      </fieldset>
+
+      <fieldset>
+        <label for="cc-cvc">CVC</label>
+        <input id="cc-cvc" type="text" autocompletetype="cc-csc" placeholder="123" required autocomplete="off" data-pin="cvc">
+      </fieldset>
+
+      <fieldset>
+        <label for="cc-address">Address</label>
+        <input id="cc-address" name='entrant[cc_address]' required autocompletetype="street-address" data-pin="address_line1">
+      </fieldset>
+
+      <fieldset>
+        <label for="cc-city">City</label>
+        <input id="cc-city" name='entrant[cc_city]' required autocompletetype="city" data-pin="address_city">
+      </fieldset>
+
+      <fieldset>
+        <label for="cc-postcode">Postcode</label>
+        <input id="cc-postcode" name='entrant[cc_post_code]' required autocompletetype="postal-code" data-pin="address_postcode">
+      </fieldset>
+
+      <fieldset>
+        <label for="cc-state">State</label>
+        <input id="cc-state" name='entrant[cc_state]' required autocompletetype="state" data-pin="address_state">
+      </fieldset>
+
+      <fieldset>
+        <label for="cc-country">Country</label>
+        <input id="cc-country" name='entrant[cc_country]' required autocompletetype="country-name" data-pin="address_country">
+      </fieldset>
+
+      <fieldset class="registration">
+        <div class="registration-agreement">
+          This card will be billed $275 on May 22nd,<br>
+          <em>only</em> if you’re successful in the ballot.
+        </div>
+        <button class="register-button" data-busy-text="Hold tight...">Enter the ballot</button>
+      </fieldset>
+    </div>
   </form>
 </section>
 

@@ -26,6 +26,20 @@ define(["utils/dom", "pinjs", "domReady"], function(utils, pinjs, domReady) {
 
       }, false);
     });
+
+    setupPartRadio();
+  }
+
+  function setupPartRadio() {
+    $$('input[name=entry-type]').forEach(function(radio) {
+      radio.addEventListener('click', function(e) {
+        ["scholarship", "ballot"].forEach(function(part) {
+          $("#" + part + "-part").className = "entry-part" + ( (part == radio.value) ? " selected" : "" );
+        });
+      });
+
+      return true;
+    });
   }
 
   function clearErrors(form) {

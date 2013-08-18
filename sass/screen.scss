@@ -165,6 +165,9 @@ input[type="radio"] + label { margin-left: .5em; }
 #entrant_tee_cut_female:checked ~ label[for="entrant_tee_size_female"],
 #entrant_tee_cut_female:checked ~ #entrant_tee_size_female { display: block; }
 
+.entry-part { display: none; }
+.entry-part.selected { display: block; }
+
 .errors { color: #fee; margin: 1em 0; }
 
 .registration-agreement { text-align: right; float: left; }
