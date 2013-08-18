@@ -7,9 +7,6 @@ require 'json'
 module Railscamp
 class Thirteen < Sinatra::Base
 
-  MALE_TEE_SIZES = %w( S M L XL 2XL )
-  FEMALE_TEE_SIZES = %w( XS S M L XL 2XL )
-  TEE_SIZE_DEFAULT = "L"
   SUBMISSION_DEADLINE = Time.new(2013,5,21,0,0,0,"+10:00").utc
 
   configure :development do
@@ -19,15 +16,15 @@ class Thirteen < Sinatra::Base
 
   register Sinatra::SequelExtension
 
-  migration "create the entrants table" do
+  migration "create the inital tables" do
     database.create_table :entrants do
       primary_key :id
       Time :created_at, null: false
       String :name, null: false
       String :email, null: false
-      String :tee_cut, null: false
-      String :tee_size_male
-      String :tee_size_female
+      String :dietary_reqs, text: true
+      TrueClass :wants_bus, null: false
+
       String :cc_name, null: false
       String :cc_address, null: false
       String :cc_city, null: false
@@ -35,26 +32,33 @@ class Thirteen < Sinatra::Base
       String :cc_state, null: false
       String :cc_country, null: false
       String :card_token, null: false
+
       String :ip_address, null: false
+      Time   :chosen_at
+      Time   :chosen_notified_at
     end
-  end
 
-  migration "add diet column" do
-    database.add_column :entrants, :dietary_reqs, String, text: true
-  end
+    database.create_table :scholarship_entrants do
+      primary_key :id
+      Time :created_at, null: false
+      String :name, null: false
+      String :email, null: false
+      String :dietary_reqs, text: true
+      TrueClass :wants_bus, null: false
 
-  migration "add chosen_at column" do
-    database.add_column :entrants, :chosen_at, Time
-  end
+      String :scholarship_pitch, null:false, text: true
+      String :scholarship_github, null: false
 
-  migration "add chosen_notified_at column" do
-    database.add_column :entrants, :chosen_notified_at, Time
+      String :ip_address, null: false
+      Time   :chosen_at
+      Time   :chosen_notified_at
+    end
   end
 
   class Entrant < Sequel::Model
     PUBLIC_ATTRS = [
-      :name, :email, :dietary_reqs, :tee_cut, :tee_size_male, :tee_size_female, :cc_name,
-      :cc_address, :cc_city, :cc_post_code, :cc_state, :cc_country,
+      :name, :email, :dietary_reqs, :wants_bus,
+      :cc_name, :cc_address, :cc_city, :cc_post_code, :cc_state, :cc_country,
       :card_token, :ip_address
     ]
 
@@ -73,22 +77,34 @@ class Thirteen < Sinatra::Base
 
     def validate
       super
-      validates_presence PUBLIC_ATTRS - [:tee_size_male, :tee_size_female, :dietary_reqs]
+      validates_presence PUBLIC_ATTRS - [:dietary_reqs]
     end
 
     def before_save
-      # Front-end form submits unneccesary tee size fields
-      case self.tee_cut
-      when "male"
-        self.tee_size_female = nil
-      when "female"
-        self.tee_size_male = nil
-      end
       self.created_at = Time.now.utc
     end
 
     def choose!
       update(chosen_at: Time.now.utc)
+    end
+  end
+
+  class ScholarshipEntrant < Sequel::Model
+    PUBLIC_ATTRS = [
+      :name, :email, :dietary_reqs, :wants_bus,
+      :scholarship_github, :scholarship_pitch
+    ]
+
+    set_allowed_columns *PUBLIC_ATTRS
+    plugin :validation_helpers
+
+    def validate
+      super
+      validates_presence PUBLIC_ATTRS - [:dietary_reqs]
+    end
+
+    def before_save
+      self.created_at = Time.now.utc
     end
   end
 
@@ -107,15 +123,6 @@ class Thirteen < Sinatra::Base
   end
 
   helpers do
-    def male_tee_sizes
-      MALE_TEE_SIZES
-    end
-    def female_tee_sizes
-      FEMALE_TEE_SIZES
-    end
-    def tee_size_default
-      TEE_SIZE_DEFAULT
-    end
     def partial(name)
       erb name, layout: false
     end
@@ -144,6 +151,9 @@ class Thirteen < Sinatra::Base
   get '/register' do
     erb :register
   end
+  get '/scholarship' do
+    erb :scholarship
+  end
 
   post '/register' do
     STDERR.puts JSON.generate(params)
@@ -154,6 +164,19 @@ class Thirteen < Sinatra::Base
     else
       @errors = entrant.errors
       erb :register
+    end
+  end
+
+
+  post '/scholarship' do
+    STDERR.puts JSON.generate(params)
+    entrant = ScholarshipEntrant.new(params[:entrant])
+    if entrant.valid?
+      entrant.save
+      redirect "/✌"
+    else
+      @errors = entrant.errors
+      erb :scholarship
     end
   end
 

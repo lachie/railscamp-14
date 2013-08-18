@@ -151,28 +151,21 @@ input[type='radio'] {
   margin-top: .4em;
 }
 
+.camp-location { text-decoration: underline; }
+
 .register-button { @extend .button; font-size: 1.5em; background: #5B5B5B; }
 
 input[type="radio"], input[type="radio"] + label { display: inline; }
-input[type="radio"] + label { margin-left: .5em; }
+input[type="radio"] + label { margin-left: .5em; width: 40%; }
 
-.t-shirt .size { display: none; width: auto; margin-left: 5%; }
-.t-shirt .tee { clear: both; }
-
-#entrant_tee_cut_male:checked ~ label[for="entrant_tee_size_male"],
-#entrant_tee_cut_male:checked ~ #entrant_tee_size_male { display: block; }
-
-#entrant_tee_cut_female:checked ~ label[for="entrant_tee_size_female"],
-#entrant_tee_cut_female:checked ~ #entrant_tee_size_female { display: block; }
-
-.entry-part { display: none; }
-.entry-part.selected { display: block; }
 
 .errors { color: #fee; margin: 1em 0; }
 
 .registration-agreement { text-align: right; float: left; }
 .register-button { float: right; }
 
+
+.alternate-entry-button { margin: 1em 0 }
 
 footer[role='contentinfo'] { display: table-footer-group; }
 

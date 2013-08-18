@@ -1,0 +1,63 @@
+<%
+  @page_class = "register"
+  @page_title = "Register"
+%>
+
+<%= partial :_header_banner %>
+
+<section class="grid ballot-info" role="main">
+  <% if @errors %>
+    <div class="errors">
+      <h1>Oh snap! Something isn't quite right</h1>
+      <p>There was an error with your details. Give it another go.</p>
+      <ol>
+        <% for message in @errors.full_messages %>
+          <li><%= message %></li>
+        <% end %>
+      </ol>
+    </div>
+  <% else %>
+    <h1>Apply for a scholarship</h1>
+    <p>We've dedicated a number of tickets to scholarships– these tickets will be allocated from a separate pool.<p>
+    
+    <p>If you'd like to enter, instead of credit card details, enter your github username and a short pitch on how you'd use the scholarship. 
+    If you're selected, your Railscamp will be paid for, including transport to the campsite, accommodation and meals.</p>
+
+    <p>You have until <strong>midnight (AEST) on Monday September 2</strong> to apply.</p>
+
+    <a href="/register" class="button alternate-entry-button">Enter the ballot instead</a>
+  <% end %>
+
+  <form method="post">
+    <div class="ticket-info">
+      <div class="price">Sponsored</div>
+      <div class="price-buys">Includes accomodation &amp; meals</div>
+    </div>
+
+    <%= partial :_form_common %>
+
+    <h2>Apply for a scholarship</h2>
+    <p>Show us your code on github and write a bit about how you'd use your scholarship.</p>
+
+    <fieldset>
+      <label for="github">http://github.com/</label>
+      <input id="github" name="entrant[scholarship_github]" requred>
+    </fieldset>
+
+    <fieldset>
+      <label for="pitch">I'd use my scholarship to</label>
+      <textarea id="pitch" name="entrant[scholarship_pitch]" required></textarea>
+    </fieldset>
+
+    <fieldset class="registration">
+      <div class="registration-agreement">
+        We'll review your details and let you know<br>
+        if you've been selected.
+      </div>
+      <button class="register-button" data-busy-text="Hold tight...">Apply</button>
+    </fieldset>
+  </form>
+</section>
+
+
+
