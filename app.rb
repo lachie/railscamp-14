@@ -139,7 +139,7 @@ class Thirteen < Sinatra::Base
       when "/register"
         ensure_host! "secure.ruby.org.au", 'https', 302
       else
-        ensure_host! "melb13.railscamps.org", 'http', 301
+        ensure_host! "syd14.railscamps.org", 'http', 301
       end
     end
   end

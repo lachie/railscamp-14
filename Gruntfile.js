@@ -41,7 +41,7 @@ module.exports = function(grunt) {
       rc13: {
         options: {
           sourceMap: "public/js/rc13.js.map",
-          sourceMappingURL: "http://melb13.railscamps.org/js/rc13.js.map"
+          sourceMappingURL: "http://syd14.railscamps.org/js/rc13.js.map"
         },
         files: {
           'public/js/rc13.js': ['components/requirejs/require.js', 'build/rc13.js']
