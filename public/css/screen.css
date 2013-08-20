@@ -358,7 +358,7 @@ a {
 
 /* Image background */
 html {
-  background: url("/images/bg.jpg") no-repeat center top fixed;
+  background: url("/images/bg.jpg?v2") no-repeat center top fixed;
   background-size: cover; }
 
 /* Fade in the body when everything has loaded */
