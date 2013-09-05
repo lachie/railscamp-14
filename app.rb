@@ -4,14 +4,38 @@ require 'sinatra'
 require 'sinatra/sequel'
 require 'json'
 
+
+def required_env_var(env)
+  (ENV[env] || raise("Missing #{env} env var"))
+end
+
+
 module Railscamp
 class Thirteen < Sinatra::Base
 
   SUBMISSION_DEADLINE = Time.new(2013,5,21,0,0,0,"+10:00").utc
+  TICKET_PRICE_CENTS = required_env_var("TICKET_PRICE_CENTS").to_i
+  TICKET_PRICE_CURRENCY = "AUD"
 
   configure :development do
     require 'sinatra/reloader'
     register Sinatra::Reloader
+
+    set :pin, {
+      publishable_key: required_env_var('PIN_TEST_PUBLISHABLE_KEY'),
+      secret_key: required_env_var('PIN_TEST_SECRET_KEY'),
+      api: 'test',
+      api_root: 'https://test-api.pin.net.au/1'
+    }
+  end
+
+  configure :production do
+    set :pin, {
+      publishable_key: required_env_var('PIN_LIVE_PUBLISHABLE_KEY'),
+      secret_key: required_env_var('PIN_LIVE_SECRET_KEY'),
+      api: 'live',
+      api_root: 'https://api.pin.net.au/1'
+    }
   end
 
   register Sinatra::SequelExtension
@@ -55,6 +79,15 @@ class Thirteen < Sinatra::Base
     end
   end
 
+  migration "add chosen_notified_at column" do
+    database.add_column :entrants, :chosen_notified_at, Time
+  end
+
+
+  migration "add charge columns" do
+    database.add_column :entrants, :charge_token, String
+  end
+
   class Entrant < Sequel::Model
     PUBLIC_ATTRS = [
       :name, :email, :dietary_reqs, :wants_bus,
@@ -87,6 +120,13 @@ class Thirteen < Sinatra::Base
     def choose!
       update(chosen_at: Time.now.utc)
     end
+
+    def set_charge_token!(token)
+      update charge_token: token
+    end
+    def charged?
+      charge_token
+    end
   end
 
   class ScholarshipEntrant < Sequel::Model
@@ -108,19 +148,9 @@ class Thirteen < Sinatra::Base
     end
   end
 
-  configure :development do
-    set :pin, {
-      publishable_key: ENV['PIN_TEST_PUBLISHABLE_KEY'] || raise("Missing PIN_TEST_PUBLISHABLE_KEY env var"),
-      api: 'test'
-    }
-  end
+ 
 
-  configure :production do
-    set :pin, {
-      publishable_key: ENV['PIN_LIVE_PUBLISHABLE_KEY'] || raise("Missing PIN_LIVE_PUBLISHABLE_KEY env var"),
-      api: 'live'
-    }
-  end
+
 
   helpers do
     def partial(name)
@@ -143,6 +173,41 @@ class Thirteen < Sinatra::Base
       end
     end
   end
+
+
+  class Pin
+    include HTTParty
+    format :json
+    base_uri Railscamp::Thirteen.settings.pin[:api_root]
+    basic_auth Railscamp::Thirteen.settings.pin[:secret_key], ''
+  end
+
+  class EntrantCharger
+    def charge!(entrant)
+      if entrant.charged?
+        raise("Entrant #{entrant.id} #{entrant.email} has already been charged")
+      end
+      body = Pin.post("/charges", body: params(entrant))
+      if response = body['response']
+        entrant.set_charge_token!(response['token'])
+        response
+      else
+        entrant.errors.add("credit card", "charging failed")
+        raise "Charge failed for entrant #{entrant.id} #{entrant.email}: \n#{body.inspect}"
+      end
+    end
+    def params(entrant)
+      {
+        email: entrant.email,
+        description: "Railscamp XIV Sydney",
+        amount: TICKET_PRICE_CENTS,
+        currency: TICKET_PRICE_CURRENCY,
+        ip_address: entrant.ip_address,
+        card_token: entrant.card_token
+      }
+    end
+  end
+
 
   get '/' do
     erb :home
