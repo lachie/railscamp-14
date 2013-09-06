@@ -3,10 +3,19 @@
 require 'sinatra'
 require 'sinatra/sequel'
 require 'json'
+require 'httparty'
+require 'mail'
 
+require 'pp'
 
 def required_env_var(env)
   (ENV[env] || raise("Missing #{env} env var"))
+end
+
+class Object
+  def tapp
+    tap {|o| pp o }
+  end
 end
 
 
@@ -206,6 +215,14 @@ class Thirteen < Sinatra::Base
         ip_address: entrant.ip_address,
         card_token: entrant.card_token
       }
+    end
+  end
+
+  class EntrantMailer
+    def mail!(entrant)
+      if entrant.mailed?
+        raise("already mailed #{entrant.id} #{entrant.email}")
+      end
     end
   end
 

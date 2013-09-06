@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+
+# Charges all uncharged entrant
+
+$: << "." << File.dirname(__FILE__)
+
+require 'app'
+
+STDERR.puts Railscamp::Thirteen::EntrantMailer.new.mail!(entrant)
