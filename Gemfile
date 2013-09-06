@@ -7,6 +7,7 @@ gem "sinatra-sequel"
 gem "pg"
 gem "json"
 gem "httparty"
+gem 'mail'
 
 group :development do
   # For sinatra/reloader
