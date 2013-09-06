@@ -79,10 +79,6 @@ class Thirteen < Sinatra::Base
     end
   end
 
-  migration "add chosen_notified_at column" do
-    database.add_column :entrants, :chosen_notified_at, Time
-  end
-
 
   migration "add charge columns" do
     database.add_column :entrants, :charge_token, String
@@ -95,7 +91,9 @@ class Thirteen < Sinatra::Base
       :card_token, :ip_address
     ]
 
-    set_allowed_columns *PUBLIC_ATTRS
+    CHARGE_ATTRS = [ :charge_token ]
+
+    set_allowed_columns *[ PUBLIC_ATTRS, CHARGE_ATTRS ].flatten
     plugin :validation_helpers
 
     def self.submitted_before_deadline
@@ -126,6 +124,9 @@ class Thirteen < Sinatra::Base
     end
     def charged?
       charge_token
+    end
+    def self.uncharged
+      filter(charge_token: nil)
     end
   end
 
