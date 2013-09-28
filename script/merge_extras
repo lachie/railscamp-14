@@ -1,0 +1,33 @@
+#!/usr/bin/env ruby
+
+# swaps entrants
+
+require 'pp'
+require 'pathname'
+require 'csv'
+$: << "." << File.dirname(__FILE__)
+
+require 'app'
+
+
+rce = Pathname("rc_extras.csv")
+ep = ->(e) { "#{e.email} (#{e.id})" }
+
+i = 0
+CSV.foreach(rce) do |row|
+  i += 1
+  next if i == 1
+
+  _date,email,name,tshirt_size,bedding = *row
+  if entrant = Railscamp::Thirteen::Entrant.with_email(email)
+    if entrant.needs_extras?
+      puts "setting extras #{ep[entrant]}"
+      entrant.update_extras!(bedding, tshirt_size)
+    else
+      puts "nox #{ep[entrant]}"
+    end
+  else
+    puts "couldn't find entrant for #{email} (#{name})"
+  end
+end
+

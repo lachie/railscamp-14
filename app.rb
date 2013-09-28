@@ -88,19 +88,32 @@ class Thirteen < Sinatra::Base
     end
   end
 
-
   migration "add charge columns" do
     database.add_column :entrants, :charge_token, String
+  end
+
+  migration "add ticket type column" do
+    database.add_column :entrants, :ticket_type, String
+    database.add_column :entrants, :notes, String, text: true
+  end
+
+
+  migration "add bedding and tshirt" do
+    database.add_column :entrants, :tshirt_size, String
+    database.add_column :entrants, :wants_bedding, TrueClass
   end
 
   class Entrant < Sequel::Model
     PUBLIC_ATTRS = [
       :name, :email, :dietary_reqs, :wants_bus,
       :cc_name, :cc_address, :cc_city, :cc_post_code, :cc_state, :cc_country,
-      :card_token, :ip_address
+      :card_token, :ip_address,
+      :ticket_type, :notes,
+      :wants_bedding, :tshirt_size
     ]
 
     CHARGE_ATTRS = [ :charge_token ]
+    OPTIONAL_ATTRS = [ :notes, :ticket_type, :wants_bedding, :tshirt_size, :dietary_reqs ]
 
     set_allowed_columns *[ PUBLIC_ATTRS, CHARGE_ATTRS ].flatten
     plugin :validation_helpers
@@ -114,10 +127,22 @@ class Thirteen < Sinatra::Base
     def self.chosen
       exclude(chosen_at: nil)
     end
+    def self.with_email(email)
+      filter(email: email.to_s.downcase).first
+    end
+
+    def needs_extras?
+      wants_bedding.nil? || tshirt_size.nil?
+    end
+
+    def update_extras!(bedding_string, tshirt_size)
+      wants_bedding = !! bedding_string[/bedding pack/]
+      update wants_bedding: wants_bedding, tshirt_size: tshirt_size
+    end
 
     def validate
       super
-      validates_presence PUBLIC_ATTRS - [:dietary_reqs]
+      validates_presence PUBLIC_ATTRS - OPTIONAL_ATTRS
     end
 
     def before_save
@@ -136,6 +161,24 @@ class Thirteen < Sinatra::Base
     end
     def self.uncharged
       filter(charge_token: nil)
+    end
+
+
+    def self.create_without_cc!(name, email, ticket_type, notes=nil)
+      create(name: name,
+             email: email,
+             wants_bus: true,
+             cc_name: 'xxx',
+             cc_address: 'xxx',
+             cc_city: 'xxx',
+             cc_post_code: 'xxx',
+             cc_state: 'xxx',
+             cc_country: 'xxx',
+             card_token: 'xxx',
+             ip_address: 'xxx',
+             ticket_type: ticket_type,
+             notes: notes
+            )
     end
   end
 

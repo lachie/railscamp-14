@@ -1,0 +1,31 @@
+#!/usr/bin/env ruby
+
+# swaps entrants
+
+require 'pp'
+$: << "." << File.dirname(__FILE__)
+
+require 'app'
+
+ep = ->(e) { "#{e.email} (#{e.id})" }
+
+swap = ->(from_entrant_id, to_name, to_email) {
+  from_entrant = Railscamp::Thirteen::Entrant[from_entrant_id]
+
+  puts "from #{ep[from_entrant]}"
+
+  ticket_type = 'swapped'
+  notes = "swapped from #{ep[from_entrant]}"
+
+  Railscamp::Thirteen::Entrant.create_without_cc!(to_name, to_email, ticket_type, notes)
+  from_entrant.update(ticket_type:nil, notes: "swapped to #{to_email}")
+}
+
+#STDERR.puts Railscamp::Thirteen::EntrantCharger.new.charge!(entrant)
+
+swap[79, "Matt Saddington", "matt@sol1.com.au"]
+swap[78, "Joelle Peters", "joelle@reinteractive.net"]
+swap[61, "Samuel Cochrane", "sj26@sj26.com"]
+
+
+#remove bus Paul Fioravanti
