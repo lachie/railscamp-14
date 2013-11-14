@@ -1,4 +1,4 @@
-# Railscamp 13 Website
+# Railscamp 14 Website
 
 To get started, run [`script/bootstrap`](script/bootstrap)
 
