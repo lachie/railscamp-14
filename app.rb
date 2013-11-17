@@ -103,6 +103,26 @@ class Thirteen < Sinatra::Base
     database.add_column :entrants, :wants_bedding, TrueClass
   end
 
+  migration "create the bedding_payments table" do
+    database.create_table :bedding_payments do
+      primary_key :id
+      Time :created_at, null: false
+      String :cc_name, null: false
+      String :cc_address, null: false
+      String :cc_city, null: false
+      String :cc_post_code, null: false
+      String :cc_state, null: false
+      String :cc_country, null: false
+      String :card_token, null: false
+      String :ip_address, null: false
+      String :charge_token
+    end
+  end
+
+  migration "add email to bedding_payments" do
+    database.add_column :bedding_payments, :email, String
+  end
+
   class Entrant < Sequel::Model
     PUBLIC_ATTRS = [
       :name, :email, :dietary_reqs, :wants_bus,
@@ -182,6 +202,36 @@ class Thirteen < Sinatra::Base
     end
   end
 
+
+  module PayableModel
+    CC_ATTRS = [
+      :email, :cc_name, :cc_address, :cc_city, :cc_post_code, :cc_state, :cc_country,
+      :card_token, :ip_address
+    ]
+
+    def set_charge_token!(token)
+      update charge_token: token
+    end
+    def charged?
+      charge_token
+    end
+  end
+
+  class BeddingPayment < Sequel::Model
+    include PayableModel
+    plugin :validation_helpers
+
+    def validate
+      super
+      validates_presence CC_ATTRS
+    end
+
+    def before_create
+      self.created_at = Time.now.utc
+    end
+  end
+
+
   class ScholarshipEntrant < Sequel::Model
     PUBLIC_ATTRS = [
       :name, :email, :dietary_reqs, :wants_bus,
@@ -206,9 +256,14 @@ class Thirteen < Sinatra::Base
 
 
   helpers do
-    def partial(name)
-      erb name, layout: false
+    def partial(name, locals={})
+      erb name, layout: false, locals: locals
     end
+
+    def h(text)
+      Rack::Utils.escape_html(text)
+    end
+
     def ensure_host!(host, scheme, status)
       unless request.host == host && request.scheme == scheme
         redirect "#{scheme}://#{host}#{request.path}", status
@@ -219,7 +274,7 @@ class Thirteen < Sinatra::Base
   configure :production do
     before do
       case request.path
-      when "/register"
+      when "/register", %w{^/pay}
         ensure_host! "secure.ruby.org.au", 'https', 302
       else
         ensure_host! "syd14.railscamps.org", 'http', 301
@@ -260,6 +315,38 @@ class Thirteen < Sinatra::Base
       }
     end
   end
+
+
+  class PinCharger
+    def initialize(param_overrides = {})
+      @default_params = {
+        description: "Railscamp XIII Melbourne",
+        amount: TICKET_PRICE_CENTS,
+        currency: TICKET_PRICE_CURRENCY,
+      }.merge(param_overrides)
+    end
+    def charge!(payable_model)
+      if payable_model.charged?
+        raise("#{payable_model.class.name} #{payable_model.id} has already been charged")
+      end
+      body = Pin.post("/charges", body: params(payable_model))
+      if response = body['response']
+        payable_model.set_charge_token!(response['token'])
+        response
+      else
+        payable_model.errors.add("credit card", "charging failed")
+        raise "Charge failed for payable_model #{payable_model.id}: \n#{body.inspect}"
+      end
+    end
+    def params(payable_model)
+      @default_params.merge({
+        email: payable_model.email,
+        ip_address: payable_model.ip_address,
+        card_token: payable_model.card_token
+      })
+    end
+  end
+
 
   class EntrantMailer
     def mail!(entrant)
@@ -309,6 +396,37 @@ class Thirteen < Sinatra::Base
 
   get '/✌' do
     erb :thanks
+  end
+
+
+  get '/pay_for_bedding' do
+    @bedding_payment = BeddingPayment.new
+    erb(:pay_for_bedding)
+  end
+
+  post '/pay_for_bedding' do
+    STDERR.puts JSON.generate(params)
+
+    # Save the bedding_payment
+    @bedding_payment = BeddingPayment.new(params[:bedding_payment])
+
+    unless @bedding_payment.valid?
+      @errors = @bedding_payment.errors
+      return erb(:pay_for_bedding)
+    end
+
+    @bedding_payment.save
+
+    # Try to charge their card
+    begin
+      PinCharger.new(description: "Railscamp XIV Bedding", amount: 12_00).charge!(@bedding_payment)
+    rescue Exception => e
+      STDERR.puts "Charge error: #{e.inspect}"
+      @errors = @bedding_payment.errors
+      return erb(:pay_for_bedding)
+    end
+
+    erb(:paid)
   end
 
 end

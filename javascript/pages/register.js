@@ -79,12 +79,13 @@ define(["utils/dom", "pinjs", "domReady"], function(utils, pinjs, domReady) {
       input.type = 'hidden'; input.name = name; input.value = value;
       form.appendChild(input);
     }
-    appendHiddenInput('entrant[card_token]', response.response.token);
-    appendHiddenInput('entrant[ip_address]', response.ip_address);
+    $("[data-pin-card-token]", form).value = response.response.token;
+    $("[data-pin-ip-address]", form).value = response.ip_address;
   }
 
   function showPinError(form, description, messages) {
-    console.log(description, messages);
+    if (window.console && console.log)
+      console.log(description, messages);
 
     var errors = document.createElement('div');
     errors.className = "errors";
