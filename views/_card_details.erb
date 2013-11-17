@@ -2,6 +2,7 @@
 
 <h2>Card details</h2>
 
+
 <fieldset>
   <label for="cc-name">Name on card</label>
   <input id="cc-name" name='<%= payment_model_name %>[cc_name]' required autocompletetype="cc-name" format=".+\s.+" pattern=".+\s.+" data-pin="name" value="<%=h payment_model.cc_name %>">
@@ -10,6 +11,7 @@
 <fieldset>
   <label for="cc-number">Credit card number</label>
   <input id="cc-number" type="text" autocompletetype="cc-number" format="\d{15,16}" pattern="\d{15,16}" placeholder="4242424242424242" required data-pin="number">
+  <p>No AMEX sorry!</p>
 </fieldset>
 
 <fieldset>
